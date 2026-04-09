@@ -1,5 +1,24 @@
+#Note: Used ChatGPT to make revisions regarding using Spotipy
+
 import speech_recognition as sr 
+import spotipy
 import webbrowser
+from spotipy.oauth2 import SpotifyOAuth
+
+scope = "user-library-read"
+
+client_id = "de9ec8339449488fb70af01fab12b244"
+client_secret = "c75c03f3113244bd97eb6e84d4b248ae"
+redirect_uri = "http://127.0.0.1:8888/callback"
+scope = "user-read-playback-state,user-modify-playback-state"
+
+sp = spotipy.Spotify(
+        auth_manager=spotipy.SpotifyOAuth(
+          client_id=client_id,
+          client_secret=client_secret,
+          redirect_uri=redirect_uri,    
+          scope=scope, open_browser=False))
+
 r = sr.Recognizer()
 
 songDict = {
@@ -84,7 +103,8 @@ while currentlyListening:
             text = r.recognize_google(audio_text)
             for song in songList:
                 if song in text:
-                    webbrowser.open_new(songDict[song])
+                    webbrowser.open(songDict[song])
+                    sp.start_playback(uris=[f"spotify:track:{songDict[song][31:-20]}"])
             if "stop listening" in text:
                 currentlyListening = False
         except sr.UnknownValueError:
